@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/rsa"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,7 +13,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const serverURL string = "http://private-e7633-cfe1.apiary-mock.com/"
+var (
+	verifyKey *rsa.PublicKey
+)
+
+const (
+	serverURL string = "http://private-e7633-cfe1.apiary-mock.com/"
+)
 
 type Regions []struct {
 	ID   int    `json:"id"`

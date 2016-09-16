@@ -1,5 +1,6 @@
 {
     "clientID": "18590563924-v8qe0beonlg0amitfj2r49iaeh5bo2ck.apps.googleusercontent.com",
     "clientSecret": "LzvMp8Csga8bvHi22byU0WGd",
-    "secret": "asdifj9182u98u98efua"
+    "secret": "asdifj9182u98u98efua",
+    "port": ":3000"
 }

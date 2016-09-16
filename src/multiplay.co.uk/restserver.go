@@ -22,6 +22,7 @@ type Config struct {
 	ClientSecret string `json:"clientSecret"`
 	ClientID     string `json:"clientID"`
 	Secret       string `json:"secret"`
+	Port         string `json:"port"`
 }
 
 var (
@@ -57,7 +58,7 @@ func main() {
 	router := NewRouter()
 
 	// Bind to a port and pass our router in
-	log.Fatal(http.ListenAndServe(":3000", router))
+	log.Fatal(http.ListenAndServe(cfg.Port, router))
 }
 
 func loadConfig(file string) (*Config, error) {
