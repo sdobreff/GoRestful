@@ -9,7 +9,18 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-func Logger(inner http.Handler, name string) http.Handler {
+type Logger struct {
+	inner http.Handler
+	name  string
+}
+
+func NewLogger(inner http.Handler, name string) *Logger {
+	logger := Logger{inner, name}
+
+	return &logger
+}
+
+func (logger Logger) LogHandler() http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// session, err := store.Get(r, "sess")
@@ -61,15 +72,18 @@ func Logger(inner http.Handler, name string) http.Handler {
 			return
 		}
 
-		start := time.Now()
-		inner.ServeHTTP(w, r)
+		logger.inner.ServeHTTP(w, r)
 
-		log.Printf(
-			"%s\t%s\t%s\t%s",
-			r.Method,
-			r.RequestURI,
-			name,
-			time.Since(start),
-		)
+		logger.ExecuteLog(r)
 	})
+}
+
+func (logger Logger) ExecuteLog(r *http.Request) {
+	log.Printf(
+		"%s\t%s\t%s\t%s",
+		r.Method,
+		r.RequestURI,
+		logger.name,
+		time.Since(time.Now()),
+	)
 }
