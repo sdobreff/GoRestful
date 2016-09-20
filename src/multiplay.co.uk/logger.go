@@ -2,25 +2,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-type Logger struct {
-	inner http.Handler
-	name  string
-}
-
-func NewLogger(inner http.Handler, name string) *Logger {
-	logger := Logger{inner, name}
-
-	return &logger
-}
-
-func (logger Logger) LogHandler() http.Handler {
+func RouteHandler(inner http.Handler, name string) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// session, err := store.Get(r, "sess")
@@ -48,6 +35,7 @@ func (logger Logger) LogHandler() http.Handler {
 		if "" == r.Header.Get("token") {
 			w.WriteHeader(http.StatusUnauthorized)
 			fmt.Fprintln(w, "WHAT? Invalid Token? F*** off!")
+			Warning.Println("WHAT? Invalid Token? F*** off!")
 			return
 		}
 
@@ -60,30 +48,28 @@ func (logger Logger) LogHandler() http.Handler {
 		if token.Valid {
 			claims := token.Claims.(jwt.MapClaims)
 			fmt.Printf("Token for user %v is valid!", claims["name"])
+			Info.Printf("Token for user %v is valid!", claims["name"])
 		} else {
 			w.WriteHeader(http.StatusUnauthorized)
 			fmt.Fprintln(w, "WHAT? Invalid Token? F*** off!")
+			Warning.Println("WHAT? Invalid Token? F*** off!")
 			return
 		}
 
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			fmt.Fprintln(w, "WHAT? Invalid Token? F*** off!")
+			Warning.Println("WHAT? Invalid Token? F*** off!")
 			return
 		}
 
-		logger.inner.ServeHTTP(w, r)
+		inner.ServeHTTP(w, r)
 
-		logger.ExecuteLog(r)
+		Info.Printf(
+			"%s\t%s\t%s\t",
+			r.Method,
+			r.RequestURI,
+			name,
+		)
 	})
-}
-
-func (logger Logger) ExecuteLog(r *http.Request) {
-	log.Printf(
-		"%s\t%s\t%s\t%s",
-		r.Method,
-		r.RequestURI,
-		logger.name,
-		time.Since(time.Now()),
-	)
 }
