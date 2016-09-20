@@ -25,6 +25,7 @@ type Config struct {
 	ClientID     string `json:"clientID"`
 	Secret       string `json:"secret"`
 	Port         string `json:"port"`
+	LogFilePath  string `json:"logFilePath"`
 }
 
 var (
