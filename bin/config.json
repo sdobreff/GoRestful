@@ -3,5 +3,6 @@
     "clientSecret": "LzvMp8Csga8bvHi22byU0WGd",
     "secret": "asdifj9182u98u98efua",
     "port": ":3000",
-    "logFilePath": "logs/main.log"
+    "logFilePath": "logs/main.log",
+    "asd": "asd"
 }
