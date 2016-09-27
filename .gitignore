@@ -24,6 +24,8 @@ _testmain.go
 *.exe
 *.test
 *.prof
+*.sublime-project
+*.sublime-workspace
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
