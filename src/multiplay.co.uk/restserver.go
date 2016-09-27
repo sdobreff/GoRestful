@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	defaultConfigFile = "config.json"
+	defaultConfigFile = "../config.json"
 
 	githubAuthorizeUrl = "https://accounts.google.com/o/oauth2/auth"
 	githubTokenUrl     = "https://accounts.google.com/o/oauth2/token"
