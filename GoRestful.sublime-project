@@ -1,0 +1,20 @@
+{
+	"folders":
+	[
+		{
+			"path": "src"
+		}
+	],
+	"settings":
+	{
+		"GoSublime":
+		{
+			"env":
+			{
+				"GOPATH": "$HOME/Projects/go",
+				"GOBIN": "$HOME/Projects/GoRestful/bin",
+				"PATH": "$GOPATH/bin:$PATH"
+			}
+		}
+	}
+}
