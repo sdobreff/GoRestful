@@ -4,6 +4,22 @@
 		"selected_items":
 		[
 			[
+				"Pr",
+				"Println	n int, err error ƒ"
+			],
+			[
+				"Do",
+				"DoSomethingInterface	interface ¡"
+			],
+			[
+				"Wrr",
+				"WriteString	n int, err error ƒ"
+			],
+			[
+				"Han",
+				"Handler	interface ¡"
+			],
+			[
 				"Fp",
 				"Fprintf	n int, err error ƒ"
 			],
@@ -36,42 +52,69 @@
 	"buffers":
 	[
 		{
-			"file": "src/multiplay.co.uk/restserver.go",
+			"file": "src/multiplay.co.uk/logger.go",
 			"settings":
 			{
-				"buffer_size": 3505,
+				"buffer_size": 273,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/multiplay.co.uk/routes.go",
+			"file": "src/multiplay.co.uk/tests/logger_test.go",
 			"settings":
 			{
-				"buffer_size": 292,
+				"buffer_size": 154,
 				"line_ending": "Unix"
 			}
 		},
 		{
+			"file": "config.json",
+			"settings":
+			{
+				"buffer_size": 236,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "package main\n\nimport (\n	\"net/http\"\n\n	\"github.com/gorilla/mux\"\n)\n\nfunc NewRouter() *mux.Router {\n\n	router := mux.NewRouter().StrictSlash(true)\n	for _, route := range routes {\n		var handler http.Handler\n\n		handler = route.HandlerFunc\n		handler = DefaultHandler(handler, route.Name)\n\n		router.\n			Methods(route.Method).\n			Path(route.Pattern).\n			Name(route.Name).\n			Handler(handler)\n\n	}\n\n	return router\n}\n",
+			"file": "src/multiplay.co.uk/router.go",
+			"file_size": 404,
+			"file_write_time": 131194504640000000,
+			"settings":
+			{
+				"buffer_size": 404,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "package main\n\nimport (\n	\"fmt\"\n	\"net/http\"\n\n	jwt \"github.com/dgrijalva/jwt-go\"\n)\n\nfunc DefaultHandler(inner http.Handler, name string) http.Handler {\n\n	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {\n		// session, err := store.Get(r, \"sess\")\n		// if err != nil {\n		// 	http.Error(w, err.Error(), http.StatusInternalServerError)\n		// 	return\n		// }\n		// tok := session.Values[\"accessToken\"]\n\n		// if tok == nil && name != \"Auth\" {\n		// 	b := make([]byte, 16)\n		// 	rand.Read(b)\n\n		// 	state := base64.URLEncoding.EncodeToString(b)\n\n		// 	session, _ := store.Get(r, \"sess\")\n		// 	session.Values[\"state\"] = state\n		// 	session.Save(r, w)\n\n		// 	url := oauthCfg.AuthCodeURL(state)\n		// 	http.Redirect(w, r, url, 302)\n\n		// }\n\n		invalidTokenMsg := \"WHAT? Invalid Token? F*** off!\"\n\n		if \"\" == r.Header.Get(\"token\") {\n			w.WriteHeader(http.StatusUnauthorized)\n			fmt.Fprintln(w, invalidTokenMsg)\n			FilePrintln(Warning, invalidTokenMsg)\n			return\n		}\n\n		rawToken := r.Header.Get(\"token\")\n\n		token, err := jwt.Parse(rawToken, func(token *jwt.Token) (interface{}, error) {\n			return []byte(\"secret\"), nil\n		})\n\n		if token.Valid {\n			claims := token.Claims.(jwt.MapClaims)\n			fmt.Printf(\"Token for user %v is valid!\", claims[\"name\"])\n			Info.Printf(\"Token for user %v is valid!\", claims[\"name\"])\n		} else {\n			w.WriteHeader(http.StatusUnauthorized)\n			fmt.Fprintln(w, invalidTokenMsg)\n			FilePrintln(Warning, invalidTokenMsg)\n			return\n		}\n\n		if err != nil {\n			w.WriteHeader(http.StatusUnauthorized)\n			fmt.Fprintln(w, invalidTokenMsg)\n			FilePrintln(Warning, invalidTokenMsg)\n			return\n		}\n\n		inner.ServeHTTP(w, r)\n\n		Info.Printf(\n			\"%s\\t%s\\t%s\\t\",\n			r.Method,\n			r.RequestURI,\n			name,\n		)\n	})\n}\n",
+			"file": "src/multiplay.co.uk/handler.go",
+			"file_size": 1714,
+			"file_write_time": 131194504640000000,
+			"settings":
+			{
+				"buffer_size": 1714,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Searching 7 files for \"templates\"\n\n/Users/philiplesov/Projects/GoRestful/src/multiplay.co.uk/restserver.go:\n  131  \n  132  // const (\n  133: // 	defaultLayout = \"templates/layout.html\"\n  134: // 	templateDir   = \"templates/\"\n  135  \n  136  // 	defaultConfigFile = \"config.json\"\n\n2 matches in 1 file\n",
+			"settings":
+			{
+				"buffer_size": 299,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "package main\n\nimport (\n	\"crypto/rsa\"\n	\"encoding/json\"\n	\"fmt\"\n	\"io/ioutil\"\n	\"log\"\n	\"net/http\"\n\n	\"github.com/gorilla/mux\"\n\n	\"golang.org/x/oauth2\"\n)\n\nvar (\n	verifyKey *rsa.PublicKey\n)\n\nconst (\n	serverURL string = \"http://private-e7633-cfe1.apiary-mock.com/\"\n)\n\ntype Regions []struct {\n	ID   int    `json:\"id\"`\n	Key  string `json:\"key\"`\n	Name string `json:\"name\"`\n}\n\ntype Region struct {\n	ID   int    `json:\"id\"`\n	Key  string `json:\"key\"`\n	Name string `json:\"name\"`\n}\n\ntype Providers []struct {\n	ID   int    `json:\"id\"`\n	Name string `json:\"name\"`\n}\n\ntype DataCenters []struct {\n	ID   int    `json:\"id\"`\n	Name string `json:\"name\"`\n}\n\ntype Machines []struct {\n	ID   int    `json:\"id\"`\n	Name string `json:\"name\"`\n}\n\ntype Crashes []struct {\n	ID        int    `json:\"id\"`\n	MachineID int    `json:\"machine_id\"`\n	Body      string `json:\"body\"`\n}\n\ntype PSUs struct {\n	Columns []string `json:\"columns\"`\n	Values  []struct {\n		Num0 int64 `json:\"0\"`\n		Num1 int   `json:\"1\"`\n	} `json:\"values\"`\n}\n\nfunc Index(w http.ResponseWriter, r *http.Request) {\n	res, err := http.Get(\"http://private-e7633-cfe1.apiary-mock.com/regions\")\n	if err != nil {\n		log.Fatal(err)\n	}\n	body, err := ioutil.ReadAll(res.Body)\n	if err != nil {\n		panic(err.Error())\n	}\n	var s Regions\n	json.Unmarshal(body, &s)\n	fmt.Fprintf(w, \"%v\", s[2].ID)\n}\n\nfunc AllRegions(w http.ResponseWriter, r *http.Request) {\n	res, err := http.Get(serverURL + \"regions\")\n	if err != nil {\n		log.Fatal(err)\n	}\n	body, err := ioutil.ReadAll(res.Body)\n	if err != nil {\n		panic(err.Error())\n	}\n	var s Regions\n	json.Unmarshal(body, &s)\n	fmt.Fprintf(w, \"%v\", s)\n}\n\nfunc RegionShow(w http.ResponseWriter, r *http.Request) {\n	params := mux.Vars(r)\n	id := params[\"id\"]\n\n	res, err := http.Get(serverURL + \"region/\" + id)\n	if err != nil {\n		log.Fatal(err)\n	}\n	body, err := ioutil.ReadAll(res.Body)\n	if err != nil {\n		panic(err.Error())\n	}\n	var s Region\n	json.Unmarshal(body, &s)\n	fmt.Fprintf(w, \"%v\", s)\n}\n\nfunc AllProviders(w http.ResponseWriter, r *http.Request) {\n	params := mux.Vars(r)\n	id := params[\"id\"]\n\n	res, err := http.Get(serverURL + \"region/\" + id + \"/providers\")\n	if err != nil {\n		log.Fatal(err)\n	}\n	body, err := ioutil.ReadAll(res.Body)\n	if err != nil {\n		panic(err.Error())\n	}\n	var s Providers\n	json.Unmarshal(body, &s)\n	fmt.Fprintf(w, \"%v\", s)\n}\n\nfunc AllDataCenters(w http.ResponseWriter, r *http.Request) {\n	params := mux.Vars(r)\n	id := params[\"id\"]\n\n	res, err := http.Get(serverURL + \"region/\" + id + \"/datacenters\")\n	if err != nil {\n		log.Fatal(err)\n	}\n	body, err := ioutil.ReadAll(res.Body)\n	if err != nil {\n		panic(err.Error())\n	}\n	var s DataCenters\n	json.Unmarshal(body, &s)\n	fmt.Fprintf(w, \"%v\", s)\n}\n\nfunc AllMachines(w http.ResponseWriter, r *http.Request) {\n	params := mux.Vars(r)\n	id := params[\"id\"]\n\n	res, err := http.Get(serverURL + \"region/\" + id + \"/machines\")\n	if err != nil {\n		log.Fatal(err)\n	}\n	body, err := ioutil.ReadAll(res.Body)\n	if err != nil {\n		panic(err.Error())\n	}\n	var s Machines\n	json.Unmarshal(body, &s)\n	fmt.Fprintf(w, \"%v\", s)\n}\n\nfunc AllCrashes(w http.ResponseWriter, r *http.Request) {\n	params := mux.Vars(r)\n	id := params[\"id\"]\n\n	res, err := http.Get(serverURL + \"region/\" + id + \"/crashes\")\n	if err != nil {\n		log.Fatal(err)\n	}\n	body, err := ioutil.ReadAll(res.Body)\n	if err != nil {\n		panic(err.Error())\n	}\n	var s Crashes\n	json.Unmarshal(body, &s)\n	fmt.Fprintf(w, \"%v\", s)\n}\n\nfunc AllPSUs(w http.ResponseWriter, r *http.Request) {\n	params := mux.Vars(r)\n	id := params[\"id\"]\n\n	res, err := http.Get(serverURL + \"region/\" + id + \"/psu\")\n	if err != nil {\n		log.Fatal(err)\n	}\n	body, err := ioutil.ReadAll(res.Body)\n	if err != nil {\n		panic(err.Error())\n	}\n	var s PSUs\n	json.Unmarshal(body, &s)\n	fmt.Fprintf(w, \"%v\", s)\n}\n\nfunc CallbackHandler(w http.ResponseWriter, r *http.Request) {\n	session, err := store.Get(r, \"sess\")\n	if err != nil {\n		fmt.Fprintln(w, \"aborted\")\n		return\n	}\n\n	if r.URL.Query().Get(\"state\") != session.Values[\"state\"] {\n		fmt.Fprintln(w, \"no state match; possible csrf OR cookies not enabled\")\n		return\n	}\n	tkn, err := oauthCfg.Exchange(oauth2.NoContext, r.URL.Query().Get(\"code\"))\n	if err != nil {\n		fmt.Fprintln(w, \"there was an issue getting your token\")\n		return\n	}\n\n	if !tkn.Valid() {\n		fmt.Fprintln(w, \"retreived invalid token\")\n		return\n	}\n\n	// client := oauthCfg.Client(oauth2.NoContext, tkn)\n\n	// user, err := client.Get(\"...\")\n	// fmt.Fprintln(w, user)\n	// user, _, err := client.Users.Get(\"\")\n	// if err != nil {\n	// 	fmt.Println(w, \"error getting name\")\n	// 	return\n	// }\n\n	// session.Values[\"name\"] = user.Email\n	session.Values[\"accessToken\"] = tkn.AccessToken\n	session.Save(r, w)\n\n	http.Redirect(w, r, \"/\", 302)\n}\n",
 			"file": "src/multiplay.co.uk/handlers.go",
+			"file_size": 4620,
+			"file_write_time": 131185041820000000,
 			"settings":
 			{
-				"buffer_size": 346,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "bin/config.json",
-			"settings":
-			{
-				"buffer_size": 114,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "GoRestful.sublime-project",
-			"settings":
-			{
-				"buffer_size": 233,
+				"buffer_size": 4620,
 				"line_ending": "Unix"
 			}
 		}
@@ -108,11 +151,18 @@
 	},
 	"expanded_folders":
 	[
-		"/Users/philiplesov/Projects/GOPractice/GoRestful/src",
-		"/Users/philiplesov/Projects/GOPractice/GoRestful/src/multiplay.co.uk"
+		"/Users/philiplesov/Projects/GoRestful/src",
+		"/Users/philiplesov/Projects/GoRestful/src/multiplay.co.uk",
+		"/Users/philiplesov/Projects/GoRestful/src/multiplay.co.uk/main"
 	],
 	"file_history":
 	[
+		"/Users/philiplesov/Projects/GoRestful/src/multiplay.co.uk/main/router.go",
+		"/Users/philiplesov/Projects/GoRestful/src/multiplay.co.uk/restserver.go",
+		"/Users/philiplesov/Projects/GoRestful/GoRestful.sublime-project",
+		"/Users/philiplesov/Projects/GoRestful/GoRestful.sublime-workspace",
+		"/Users/philiplesov/Projects/GoRestful/bin/config.json",
+		"/Users/philiplesov/Projects/GoRestful/src/multiplay.co.uk/routes.go",
 		"/Users/philiplesov/Projects/GOPractice/GoRestful/src/multiplay.co.uk/routes.go",
 		"/Users/philiplesov/Projects/GOPractice/GoRestful/bin/config.json",
 		"/Users/philiplesov/Library/Application Support/Sublime Text 3/Packages/User/GoSublime.sublime-settings",
@@ -153,6 +203,7 @@
 		"height": 93.0,
 		"where_history":
 		[
+			"/Users/philiplesov/Projects/GoRestful/src",
 			"",
 			"/Users/sdobreff/Projects/Non-VCS/SOG",
 			""
@@ -163,6 +214,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"templates",
+			"config.json",
 			"type",
 			"golint",
 			"showavatar",
@@ -302,19 +355,19 @@
 			[
 				{
 					"buffer": 0,
-					"file": "src/multiplay.co.uk/restserver.go",
+					"file": "src/multiplay.co.uk/logger.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3505,
+						"buffer_size": 273,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2321,
-								2321
+								272,
+								272
 							]
 						],
 						"settings":
@@ -323,7 +376,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 232.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -331,19 +384,19 @@
 				},
 				{
 					"buffer": 1,
-					"file": "src/multiplay.co.uk/routes.go",
+					"file": "src/multiplay.co.uk/tests/logger_test.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 292,
+						"buffer_size": 154,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								289,
-								289
+								154,
+								154
 							]
 						],
 						"settings":
@@ -355,53 +408,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/multiplay.co.uk/handlers.go",
+					"file": "config.json",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 346,
+						"buffer_size": 236,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								345,
-								345
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "bin/config.json",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 114,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								111,
-								111
+								233,
+								233
 							]
 						],
 						"settings":
@@ -417,33 +441,140 @@
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "GoRestful.sublime-project",
+					"buffer": 3,
+					"file": "src/multiplay.co.uk/router.go",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 233,
+						"buffer_size": 404,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								123,
-								123
+								258,
+								258
 							]
 						],
 						"settings":
 						{
-							"auto_complete": true,
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/multiplay.co.uk/handler.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1714,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								735,
+								735
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 322.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 299,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										162,
+										171
+									],
+									[
+										213,
+										222
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								97,
+								97
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([^ 	].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/multiplay.co.uk/handlers.go",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4620,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								678,
+								678
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/GoSublime/syntax/GoSublime-Go.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
@@ -483,6 +614,18 @@
 	"output.9o:///Users/philiplesov/Projects/GOPractice/GoRestful/src/multiplay.co.uk":
 	{
 		"height": 141.0
+	},
+	"output.9o:///Users/philiplesov/Projects/GoRestful/src/multiplay.co.uk":
+	{
+		"height": 94.0
+	},
+	"output.9o:///Users/philiplesov/Projects/GoRestful/src/multiplay.co.uk/main":
+	{
+		"height": 94.0
+	},
+	"output.9o:///Users/philiplesov/Projects/GoRestful/src/multiplay.co.uk/tests":
+	{
+		"height": 94.0
 	},
 	"output.9o:///Users/sdobreff/Projects/GoRestful/src/multiplay.co.uk":
 	{

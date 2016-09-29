@@ -1,7 +1,24 @@
 package tests
 
-import "testing"
+import (
+	"log"
+	"os"
+	"testing"
+
+	"../main"
+)
+
+var (
+	Trace   *log.Logger
+	Info    *log.Logger
+	Warning *log.Logger
+	Error   *log.Logger
+)
 
 func TestDefault(t *testing.T) {
-	t.Log("Test log")
+	Warning := log.New(os.Stdout,
+		"WARNING: ",
+		log.Ldate|log.Ltime|log.Lshortfile)
+
+	main.FilePrintln(Warning, "asd")
 }
